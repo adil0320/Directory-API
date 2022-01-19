@@ -84,7 +84,6 @@ const renderMeanings = async function (e) {
     if (!contiainer) return;
 
     contiainer.addEventListener('click', function (e) {
-      console.log('Logged');
       const btnSynonym = e.target.closest('.btn-synonym');
       if (!btnSynonym) return;
       inputWord.value = btnSynonym.textContent;
