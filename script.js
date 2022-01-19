@@ -4,6 +4,8 @@ const inputWord = document.querySelector('.input');
 const loader = document.querySelector('.loader');
 let btnSynonym;
 
+const clearContainer = () => (contiainer.innerHTML = '');
+
 const genSynonymMarkup = function (synonyms) {
   let markup = '<center><div class="grid-container">';
   synonyms.forEach(synonym => {
@@ -17,14 +19,43 @@ const genSynonymMarkup = function (synonyms) {
   return markup;
 };
 
-form.addEventListener('submit', async function (e) {
+const renderFetchError = function () {
+  clearContainer();
+  const markup = `
+      <h1 class= "error">
+        Could Not Find the word, Please try another word :)
+      </h1>
+  `;
+  loader.style.display = 'none';
+  contiainer.insertAdjacentHTML('beforeend', markup);
+};
+
+const renderInputError = function () {
+  clearContainer();
+  const markup = `
+      <h1 class= "error">
+        Please Enter word :)
+      </h1>
+  `;
+  loader.style.display = 'none';
+  contiainer.insertAdjacentHTML('beforeend', markup);
+};
+
+const renderMeanings = async function (e) {
   try {
     e.preventDefault();
+    clearContainer();
+    loader.style.display = 'block';
     const word = inputWord.value.toLowerCase();
+    // console.log(word);
+
+    if (word === '') return renderInputError();
 
     const res = await fetch(
       `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
     );
+
+    if (res.status === 404) return renderFetchError();
 
     const [data] = await res.json();
     const wordMeanings = data.meanings;
@@ -45,19 +76,27 @@ form.addEventListener('submit', async function (e) {
         </div>
     `;
     });
-    contiainer.innerHTML = '';
+    loader.style.display = 'none';
+    clearContainer();
     contiainer.insertAdjacentHTML('beforeend', markup);
 
-    document
-      .querySelector('.grid-container')
-      .addEventListener('click', function (e) {
-        const btnSynonym = e.target.closest('.btn-synonym');
-        if (!btnSynonym) return;
-        inputWord.value = btnSynonym.textContent;
-      });
+    // const container = document.querySelector('.container');
+    if (!contiainer) return;
+
+    contiainer.addEventListener('click', function (e) {
+      console.log('Logged');
+      const btnSynonym = e.target.closest('.btn-synonym');
+      if (!btnSynonym) return;
+      inputWord.value = btnSynonym.textContent;
+      renderMeanings(e);
+    });
   } catch (err) {
     console.error(err);
   }
+};
+
+form.addEventListener('submit', e => {
+  renderMeanings(e);
 });
 
 // <!-- <div class="summary">
