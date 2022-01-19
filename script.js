@@ -82,13 +82,14 @@ const renderMeanings = async function (e) {
 
     // const container = document.querySelector('.container');
     if (!contiainer) return;
-
-    contiainer.addEventListener('click', function (e) {
-      const btnSynonym = e.target.closest('.btn-synonym');
-      if (!btnSynonym) return;
-      inputWord.value = btnSynonym.textContent;
-      renderMeanings(e);
-    });
+    const btnSynonyms = Array.from(document.querySelectorAll('.btn-synonym'));
+    if (!btnSynonyms) return;
+    btnSynonyms.forEach(btn =>
+      btn.addEventListener('click', function (e) {
+        inputWord.value = btn.textContent;
+        renderMeanings(e);
+      })
+    );
   } catch (err) {
     console.error(err);
   }
